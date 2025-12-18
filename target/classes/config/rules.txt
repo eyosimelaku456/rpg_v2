@@ -1,4 +1,0 @@
-Rule
-Name=MaxInventorySize
-Value=20
----
