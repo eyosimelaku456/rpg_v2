@@ -1,0 +1,10 @@
+Item
+Name=HealthPotion
+Type=Potion
+Heal=50
+---
+Item
+Name=IronSword
+Type=Weapon
+Damage=15
+---

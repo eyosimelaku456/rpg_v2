@@ -1,0 +1,23 @@
+Enemy
+Name=Goblin
+HP=30
+ATK=6
+---
+Enemy
+Type=Orc
+Name=Orc Warrior
+HP=50
+ATK=10
+---
+Enemy
+Type=Mage
+Name=Enemy Mage
+HP=35
+ATK=12
+---
+Enemy
+Type=GoblinChief
+Name=Goblin Chief
+HP=60
+ATK=15
+---
