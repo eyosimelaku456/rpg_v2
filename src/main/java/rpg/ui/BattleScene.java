@@ -237,58 +237,22 @@ public class BattleScene {
                 }
             }
         });
-private void checkBattleEnd(Character player, Character enemy, TextArea log, GameEngine engine) {
-    if (enemy.getHp() <= 0) {
-        log.appendText(enemy.getName() + " has been defeated!\n");
-        // award loot here or call engine methods
-    } else if (player.getHp() <= 0) {
-        log.appendText("You have been defeated!\n");
-    }
-   }
-    
         // Next turn logic
-      nextTurnBtn.setOnAction(e -> {
-    Character enemy = enemyHolder[0];
-    if (enemy == null) return;
-
-    Character current = turnQueue.poll();
-    Character target = turnQueue.peek();
-
-    if (current != null && target != null) {
-        PauseTransition delay = new PauseTransition(Duration.seconds(1));
-        delay.setOnFinished(ev -> {
-            if (current != engine.getPlayer()) {
-                // Enemy turn
-                String actionLog;
-                if (current.getHp() < 30 && current.getInventory().hasItem("Health Potion")) {
-                    boolean used = current.getInventory().useItem("Health Potion", current);
-                    actionLog = used
-                        ? current.getName() + " used a Health Potion!"
-                        : current.getName() + " tried to use a Health Potion but failed.";
-                } else if (current.hasSkill("Smash")) {
-                    current.useSkill("Smash", target);
-                    actionLog = current.getName() + " used Smash!";
-                } else {
-                    current.attack(target);
-                    actionLog = current.getName() + " attacked " + target.getName();
-                }
-                battleLog.appendText(actionLog + "\n"); // <-- log enemy action
-            } else {
-                // Player turn
-                current.attack(target);
-                battleLog.appendText("You attacked " + target.getName() + "\n");
+        nextTurnBtn.setOnAction(e -> {
+            Character enemy = enemyHolder[0];
+            if (enemy == null || bm[0] == null || !bm[0].isBattleActive()) {
+                battleLog.appendText("No active battle.\n");
+                return;
             }
 
+            bm[0].nextTurn();
             updateEnemyStats(enemyStats, enemy);
-            checkBattleEnd(engine.getPlayer(), enemy, battleLog, engine);
-            turnQueue.add(current);
+            updatePlayerStats(playerStats, engine.getPlayer());
+            checkBattleEnd(engine.getPlayer(), enemy, battleLog, engine, stage);
         });
-        delay.play();
-    }
-    });
 
-        // Return to main menu (safe close, no MainApp restart)
-        backBtn.setOnAction(e -> stage.close());
+        // Return to main game scene
+        backBtn.setOnAction(e -> SceneManager.switchToGame());
 
         // Layout
         HBox actionButtons = new HBox(10, attackBtn, useSkillBtn, useItemBtn, nextTurnBtn);
@@ -370,16 +334,16 @@ private void checkBattleEnd(Character player, Character enemy, TextArea log, Gam
                 engine.setCurrentEnemy(null);
             } catch (Exception ignored) {}
 
-            // Show alert and close
-            Alert endAlert = new Alert(Alert.AlertType.INFORMATION, "Victory! Returning to main menu.");
+            // Show alert and return to game
+            Alert endAlert = new Alert(Alert.AlertType.INFORMATION, "Victory! Returning to game.");
             endAlert.showAndWait();
-            stage.close();
+            SceneManager.switchToGame();
 
         } else if (player.getHp() <= 0) {
             log.appendText("You were defeated!\n");
             Alert defeatAlert = new Alert(Alert.AlertType.WARNING, "You have been defeated by " + enemy.getName() + "!");
             defeatAlert.showAndWait();
-            stage.close();
+            SceneManager.switchToGame();
         }
     }
 }

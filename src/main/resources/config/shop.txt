@@ -1,3 +1,18 @@
-Name=Steel Sword;Type=Weapon;Bonus=7;Price=50
-Name=Mega Potion;Type=Potion;Heal=40;Price=30
-Name=Wooden Stick;Type=Weapon;Bonus=2;Price=10
+Item
+Name=Steel Sword
+Type=Weapon
+Bonus=7
+Price=50
+---
+Item
+Name=Mega Potion
+Type=Potion
+Heal=40
+Price=30
+---
+Item
+Name=Wooden Stick
+Type=Weapon
+Bonus=2
+Price=10
+---

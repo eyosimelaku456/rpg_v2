@@ -175,22 +175,30 @@ public class MainSceneBuilder {
             GameLogger.log("Player moved " + direction + ": " + current.toString());
             updateMapGrid(mapGrid, map);
 
-            engine.getQuestManager().checkProgress(engine);
-            for (String update : engine.getQuestManager().getRecentUpdates()) {
-                GameLogger.log(update);
-            }
+            checkQuestProgress(engine);
 
             if (current.hasEnemy()) {
-                GameLogger.log("Enemy encountered on tile!");
-                current.setHasEnemy(false);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "An enemy appears!");
-                alert.showAndWait();
-                BattleScene.show(primaryStage, engine);
+                handleEnemyEncounter(current, primaryStage, engine);
             }
 
         } else {
             statusLabel.setText("Cannot move " + direction + " — blocked or out of bounds.");
         }
+    }
+
+    private static void checkQuestProgress(GameEngine engine) {
+        engine.getQuestManager().checkProgress(engine);
+        for (String update : engine.getQuestManager().getRecentUpdates()) {
+            GameLogger.log(update);
+        }
+    }
+
+    private static void handleEnemyEncounter(Tile tile, Stage stage, GameEngine engine) {
+        GameLogger.log("Enemy encountered on tile!");
+        tile.setHasEnemy(false);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "An enemy appears!");
+        alert.showAndWait();
+        BattleScene.show(stage, engine);
     }
 
     private static void updateMapGrid(GridPane grid, GameMap map) {
