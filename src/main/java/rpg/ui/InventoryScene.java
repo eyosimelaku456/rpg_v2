@@ -61,17 +61,21 @@ public class InventoryScene {
         updateInventoryList(inventoryView, engine);
 
         Label itemDetails = new Label("Select an item to see details");
+        itemDetails.setWrapText(true);
         inventoryView.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
             int index = newVal.intValue();
             if (index >= 0 && engine.getPlayer() != null && engine.getPlayer().getInventory() != null) {
                 Item item = engine.getPlayer().getInventory().get(index);
+                String details = "";
                 if (item instanceof Weapon weapon) {
-                    itemDetails.setText("🗡️ Weapon: " + weapon.getName() + "\nBonus Damage: " + weapon.getBonusDamage());
+                    details = "🗡️ Weapon: " + weapon.getName() + "\nBonus Damage: " + weapon.getBonusDamage();
                 } else if (item instanceof Potion potion) {
-                    itemDetails.setText("🧪 Potion: " + potion.getName() + "\nHeal Amount: " + potion.getHealAmount());
+                    details = "🧪 Potion: " + potion.getName() + "\nHeal Amount: " + potion.getHealAmount();
                 } else {
-                    itemDetails.setText("📦 Item: " + item.getName());
+                    details = "📦 Item: " + item.getName();
                 }
+                details += "\n\nDescription:\n" + item.getDescription();
+                itemDetails.setText(details);
             }
         });
 

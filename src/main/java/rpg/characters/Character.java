@@ -6,9 +6,11 @@ import rpg.inventory.Item;
 import rpg.effects.StatusEffect;
 import rpg.skills.Skill;
 
+import java.io.Serializable;
 import java.util.*;
 
-public abstract class Character implements GameEntity, Attackable {
+public abstract class Character implements GameEntity, Attackable, Serializable {
+    private static final long serialVersionUID = 1L;
     protected String name;
     protected int hp;
     protected int maxHp;

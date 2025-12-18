@@ -23,6 +23,8 @@ public class MainSceneBuilder {
     public static Scene build(Stage primaryStage, GameEngine engine, GameMap gameMap,
                               List<Character> enemyObjects, TextArea logArea) {
 
+        initializeQuestTiles(gameMap, engine);
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
         root.setStyle("-fx-background-color: #f4f4f4;");
@@ -163,6 +165,16 @@ public class MainSceneBuilder {
         fade.setToValue(1);
         fade.play();
 
+        // Add Enter key binding for quest triggering
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                Tile currentTile = gameMap.getPlayerTile();
+                if (currentTile.hasQuest()) {
+                    handleQuestTrigger(currentTile, engine, logArea);
+                }
+            }
+        });
+
         return scene;
     }
 
@@ -206,27 +218,67 @@ public class MainSceneBuilder {
         for (int row = 0; row < map.getRows(); row++) {
             for (int col = 0; col < map.getCols(); col++) {
                 Tile tile = map.getTile(row, col);
-                Label tileLabel = new Label(tile.getSymbol());
-                tileLabel.setPrefSize(40, 40);
-                tileLabel.setAlignment(Pos.CENTER);
+                Button tileBtn = new Button(tile.getSymbol());
+                tileBtn.setPrefSize(40, 40);
+                tileBtn.setAlignment(Pos.CENTER);
 
-                String style = "-fx-border-color: black; -fx-background-color: white;";
+                final int finalRow = row;
+                final int finalCol = col;
+
+                String style = "-fx-border-color: black; -fx-background-color: white; -fx-font-size: 18;";
                 if (tile.hasEnemy()) {
-                    style = "-fx-border-color: red; -fx-background-color: #ffe6e6;";
+                    style = "-fx-border-color: red; -fx-background-color: #ffe6e6; -fx-font-size: 18;";
                 }
                 if (map.getPlayerRow() == row && map.getPlayerCol() == col) {
-                    style = "-fx-border-color: black; -fx-background-color: yellow;";
+                    style = "-fx-border-color: gold; -fx-background-color: yellow; -fx-font-size: 18; -fx-font-weight: bold;";
                 }
 
-                tileLabel.setStyle(style);
+                tileBtn.setStyle(style);
 
                 Tooltip tooltip = new Tooltip("Tile: " + tile.getType() +
                     (tile.hasEnemy() ? "\nEnemy present!" : "") +
                     (tile.isWalkable() ? "\nWalkable" : "\nBlocked"));
-                Tooltip.install(tileLabel, tooltip);
+                Tooltip.install(tileBtn, tooltip);
 
-                grid.add(tileLabel, col, row);
+                grid.add(tileBtn, col, row);
             }
+        }
+    }
+
+    private static void initializeQuestTiles(GameMap map, GameEngine engine) {
+        rpg.quest.Quest quest1 = new rpg.quest.Quest(
+            "Explore the Forest",
+            "Adventure awaits in the forest",
+            "Explore Forest",
+            50,
+            "Forest Creature",
+            1
+        );
+        map.getTile(2, 2).setQuestId("quest_forest");
+        engine.addQuest(quest1);
+
+        rpg.quest.Quest quest2 = new rpg.quest.Quest(
+            "Defeat a Goblin",
+            "The goblins must be dealt with",
+            "Defeat Goblin",
+            100,
+            "Goblin",
+            1
+        );
+        map.getTile(1, 3).setQuestId("quest_goblin");
+        engine.addQuest(quest2);
+    }
+
+    private static void handleQuestTrigger(Tile tile, GameEngine engine, TextArea logArea) {
+        String questId = tile.getQuestId();
+        if (questId != null) {
+            logArea.appendText("Quest marker found! Press ENTER again to accept.\n");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Quest Available");
+            alert.setHeaderText("A quest is available on this tile!");
+            alert.setContentText("Check the Quest Log for details.");
+            alert.showAndWait();
+            tile.completeQuest();
         }
     }
 }

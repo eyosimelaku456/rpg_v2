@@ -1,10 +1,18 @@
 package rpg.ui;
 
 import javafx.animation.PauseTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.Glow;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -26,13 +34,26 @@ import java.util.*;
 public class BattleScene {
     public static void show(Stage stage, GameEngine engine) {
         VBox root = new VBox(10);
-        root.setStyle("-fx-padding: 15;");
-        Label title = new Label("Battle Arena");
+        root.setPadding(new Insets(15));
+
+        try {
+            Image bgImage = new Image(BattleScene.class.getResourceAsStream("/images/menu_bg.jpeg"));
+            BackgroundImage bg = new BackgroundImage(bgImage, BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true));
+            root.setBackground(new Background(bg));
+        } catch (Exception ignored) {
+            root.setStyle("-fx-background-color: #2b2b2b;");
+        }
+
+        Label title = new Label("⚔️ Battle Arena");
+        title.setStyle("-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: white;");
+
         TextArea battleLog = new TextArea();
         battleLog.setEditable(false);
-        battleLog.setPrefHeight(200);
-        battleLog.setStyle("-fx-padding: 10;");
-        battleLog.setPrefWidth(480);
+        battleLog.setPrefHeight(350);
+        battleLog.setStyle("-fx-padding: 10; -fx-font-size: 12; -fx-text-fill: #00ff00; -fx-control-inner-background: #1a1a1a;");
+        battleLog.setPrefWidth(600);
 
         // Mode toggle: manual vs random enemy selection
         ToggleGroup modeToggle = new ToggleGroup();
@@ -83,14 +104,32 @@ public class BattleScene {
             }
         });
 
+        // Button styling
+        String buttonStyle = "-fx-font-size: 12; -fx-padding: 10 20; -fx-font-weight: bold; "
+                + "-fx-background-color: linear-gradient(to right, #ff6b6b, #ee5a6f); "
+                + "-fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;";
+        String hoverStyle = "-fx-background-color: linear-gradient(to right, #ff8787, #ff6b6b);";
+
         // Buttons
-        Button startBattleBtn = new Button("Start Battle");
-        Button attackBtn = new Button("Attack");
-        Button useSkillBtn = new Button("Use Skill");
-        Button useItemBtn = new Button("Use Item");
-        Button nextTurnBtn = new Button("Next Turn");
-        Button viewInventoryBtn = new Button("View Inventory");
-        Button backBtn = new Button("Back to Main");
+        Button startBattleBtn = new Button("⚔️ Start Battle");
+        Button attackBtn = new Button("🗡️ Attack");
+        Button useSkillBtn = new Button("✨ Use Skill");
+        Button useItemBtn = new Button("🧪 Use Item");
+        Button nextTurnBtn = new Button("🔁 Next Turn");
+        Button viewInventoryBtn = new Button("🎒 View Inventory");
+        Button backBtn = new Button("← Back to Main");
+
+        for (Button btn : Arrays.asList(startBattleBtn, attackBtn, useSkillBtn, useItemBtn, nextTurnBtn, viewInventoryBtn, backBtn)) {
+            btn.setStyle(buttonStyle);
+            btn.setOnMouseEntered(evt -> {
+                btn.setStyle(buttonStyle + hoverStyle);
+                btn.setEffect(new Glow(0.8));
+            });
+            btn.setOnMouseExited(evt -> {
+                btn.setStyle(buttonStyle);
+                btn.setEffect(null);
+            });
+        }
 
         // Battle manager reference
         BattleManager[] bm = new BattleManager[1];
@@ -151,6 +190,8 @@ public class BattleScene {
                 .map(Character::getName)
                 .reduce((a, b) -> a + " -> " + b)
                 .orElse("") + "\n");
+
+            bm[0].setOnTurnLog(msg -> Platform.runLater(() -> battleLog.appendText(msg + "\n")));
 
             // Set up end-of-battle callback
             bm[0].setOnBattleEnd((winner, loser) -> {
@@ -258,6 +299,10 @@ public class BattleScene {
         HBox actionButtons = new HBox(10, attackBtn, useSkillBtn, useItemBtn, nextTurnBtn);
         actionButtons.setPadding(new Insets(10));
 
+        ScrollPane logScroll = new ScrollPane(battleLog);
+        logScroll.setFitToWidth(true);
+        VBox.setVgrow(logScroll, javafx.scene.layout.Priority.ALWAYS);
+
         root.getChildren().addAll(
             title,
             manualMode, randomMode,
@@ -269,10 +314,10 @@ public class BattleScene {
             actionButtons,
             viewInventoryBtn,
             backBtn,
-            battleLog
+            logScroll
         );
 
-        stage.setScene(new Scene(root, 500, 600));
+        stage.setScene(new Scene(root, 700, 900));
         stage.show();
     }
 

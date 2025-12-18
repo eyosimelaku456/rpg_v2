@@ -4,10 +4,12 @@ import rpg.utils.GameLogger;
 import rpg.core.GameEngine;
 import rpg.characters.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestManager {
+public class QuestManager implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final List<Quest> activeQuests = new ArrayList<>();
     private final List<Quest> completedQuests = new ArrayList<>();
     private final List<String> recentUpdates = new ArrayList<>();

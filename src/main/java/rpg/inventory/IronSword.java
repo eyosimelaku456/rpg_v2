@@ -7,6 +7,7 @@ public class IronSword extends Item implements  Serializable {
     private static final long serialVersionUID = 1L;
     public IronSword() {
         super("Iron Sword");
+        this.description = "A reliable iron weapon. Deals 15 damage to enemies. Increases your attack power.";
     }
 
     @Override

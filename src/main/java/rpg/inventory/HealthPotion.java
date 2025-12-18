@@ -5,6 +5,7 @@ import rpg.characters.Character;
 public class HealthPotion extends Item {
     public HealthPotion() {
         super("Health Potion");
+        this.description = "Restores 20 HP when used. Essential for survival in combat.";
     }
 
     @Override

@@ -4,10 +4,12 @@ import rpg.characters.Character;
 import rpg.characters.Goblin;
 import rpg.characters.Orc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameMap {
+public class GameMap implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final int rows;
     private final int cols;
     private final Tile[][] tiles;
