@@ -1,0 +1,11 @@
+# Maven build
+target/
+
+# IDE files
+*.iml
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.dbtarget/
