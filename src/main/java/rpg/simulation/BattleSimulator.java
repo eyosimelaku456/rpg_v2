@@ -42,32 +42,39 @@ public class BattleSimulator {
         }
 
         Character enemy = (enemyObjects == null || enemyObjects.isEmpty()) ? new Goblin() : enemyObjects.get(0);
-
-        List<Character> fighters = List.of(player, enemy);
+        Character enemy2 = new Goblin();
+        enemy2.setHp(enemy2.getHp());
 
         BattleManager bm = new BattleManager();
-        bm.startBattle(player, enemy);
+        bm.setOnTurnLog(msg -> logArea.appendText(msg + "\n"));
+        bm.startBattle(player, enemy2);
+
+        logArea.appendText("⚔️ DEMO BATTLE START\n");
+        logArea.appendText("=" + "=".repeat(49) + "\n");
 
         for (int turn = 1; turn <= turns; turn++) {
             if (!bm.isBattleActive()) {
-                logArea.appendText("Battle is not active. Ending simulation.\n");
+                logArea.appendText("\n✅ Battle concluded after turn " + (turn - 1) + "\n");
                 break;
             }
 
             bm.nextTurn();
 
-            String status = "Turn " + turn + ": " +
-                    fighters.get(0).getName() + " HP=" + fighters.get(0).getHp() + ", " +
-                    fighters.get(1).getName() + " HP=" + fighters.get(1).getHp();
+            String status = String.format("Turn %d: %s (HP=%d) vs %s (HP=%d)",
+                    turn, player.getName(), player.getHp(), enemy2.getName(), enemy2.getHp());
 
             if (verbose) {
                 logArea.appendText(status + "\n");
-                GameLogger.log(status);
             }
 
-            if (fighters.get(0).getHp() <= 0 || fighters.get(1).getHp() <= 0) {
-                logArea.appendText("Battle ended!\n");
-                GameLogger.log("Battle ended!");
+            if (player.getHp() <= 0 || enemy2.getHp() <= 0) {
+                logArea.appendText("\n" + "=".repeat(50) + "\n");
+                if (player.getHp() > 0) {
+                    logArea.appendText("🎉 VICTORY! Player wins!\n");
+                } else {
+                    logArea.appendText("💀 DEFEAT! Enemy wins!\n");
+                }
+                GameLogger.log("Demo battle ended!");
                 break;
             }
         }

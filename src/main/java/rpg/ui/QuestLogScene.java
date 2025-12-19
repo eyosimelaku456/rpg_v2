@@ -25,25 +25,37 @@ public class QuestLogScene {
     public static Scene build(Stage stage, GameEngine engine) {
         VBox root = new VBox(15);
         root.setPadding(new Insets(15));
-        root.setStyle("-fx-background-color: #e6f7ff;");
+        root.setStyle("-fx-background-color: linear-gradient(to bottom, #e6f7ff, #ffffff);");
 
         Label title = new Label("📜 Quest Log");
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;");
 
         ListView<String> questList = new ListView<>();
+        questList.setStyle("-fx-control-inner-background: #ffffff; -fx-text-fill: #333;");
+
         List<Quest> quests = engine.getQuestManager().getActiveQuests();
+        java.util.Set<String> addedQuests = new java.util.HashSet<>();
 
         for (Quest q : quests) {
-            String status = q.isCompleted() ? "✅ Completed" : "🕒 In Progress";
-            questList.getItems().add(q.getTitle() + " — " + status);
+            String key = q.getTitle();
+            if (!addedQuests.contains(key)) {
+                addedQuests.add(key);
+                String status = q.isCompleted() ? "✅ Completed" : "🕒 In Progress";
+                String description = q.getDescription();
+                String reward = "Reward: " + q.getRewardGold() + " gold";
+                questList.getItems().add(q.getTitle() + " — " + status + "\n  " + description + "\n  " + reward);
+            }
         }
 
         Button backButton = new Button("⬅️ Back to Game");
-       backButton.setOnAction(e -> SceneManager.switchToGame());
+        backButton.setStyle("-fx-padding: 10; -fx-font-size: 12;");
+        backButton.setOnAction(e -> SceneManager.switchToGame());
 
+        Label activeLabel = new Label("Active Quests: " + addedQuests.size());
+        activeLabel.setStyle("-fx-font-weight: bold;");
 
-        root.getChildren().addAll(title, questList, new Separator(), backButton);
-        return new Scene(root, 600, 500);
+        root.getChildren().addAll(title, activeLabel, questList, new Separator(), backButton);
+        return new Scene(root, 700, 600);
     }
 
     /**

@@ -91,8 +91,14 @@ public class InventoryScene {
 
         ComboBox<String> unlockDropdown = new ComboBox<>();
         unlockDropdown.setPromptText("Unlockable skills");
-        // If you have a config source for unlockables, replace the static list below
-        unlockDropdown.getItems().setAll("Fireball", "Heal", "Shield");
+        if (engine.getPlayer() != null) {
+            for (var entry : engine.getPlayer().getSkills().entrySet()) {
+                if (!entry.getValue().isUnlocked()) {
+                    String costStr = " (Costs: " + entry.getValue().getRequiredBonusPoints() + " BP)";
+                    unlockDropdown.getItems().add(entry.getKey() + costStr);
+                }
+            }
+        }
 
         ComboBox<String> statDropdown = new ComboBox<>();
         statDropdown.setPromptText("Choose stat");
@@ -176,11 +182,12 @@ public class InventoryScene {
         });
 
         unlockSkillBtn.setOnAction(e -> {
-            String skillName = unlockDropdown.getValue();
-            if (skillName == null) {
+            String skillNameFull = unlockDropdown.getValue();
+            if (skillNameFull == null) {
                 logArea.appendText("No skill selected to unlock.\n");
                 return;
             }
+            String skillName = skillNameFull.split(" \\(")[0];
             boolean unlocked = engine.unlockPlayerSkill(skillName);
             logArea.appendText(unlocked ? "Unlocked skill: " + skillName + "\n" : "Failed to unlock: " + skillName + "\n");
             updateSkillDropdown(skillDropdown, engine);
